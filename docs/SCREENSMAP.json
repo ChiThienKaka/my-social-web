@@ -1,0 +1,203 @@
+{
+  "admin_screens": {
+    "layout": {
+      "root": {
+        "screen_id": "ADMIN_LAYOUT",
+        "type": "layout",
+        "description": "Global admin layout",
+        "components": [
+          "SidebarNavigation",
+          "TopHeader",
+          "MainContent",
+          "GlobalModal",
+          "ToastNotification"
+        ]
+      }
+    },
+
+    "auth": {
+      "login": {
+        "screen_id": "ADMIN_LOGIN",
+        "route": "/admin/login",
+        "type": "page",
+        "access": "public",
+        "components": ["LoginForm", "SchoolBranding", "ErrorAlert"],
+        "actions": ["submit_login", "handle_login_error"]
+      }
+    },
+
+    "dashboard": {
+      "overview": {
+        "screen_id": "DASHBOARD_OVERVIEW",
+        "route": "/admin",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": [
+          "StatCardGrid",
+          "PendingApprovalList",
+          "RecentAdminActions",
+          "SystemHealthWidget"
+        ]
+      }
+    },
+
+    "campus": {
+      "content_list": {
+        "screen_id": "CAMPUS_CONTENT_LIST",
+        "route": "/admin/campus",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["FilterBar", "CampusContentTable", "Pagination"],
+        "actions": ["filter_by_status", "open_content_detail"]
+      },
+      "content_detail": {
+        "screen_id": "CAMPUS_CONTENT_DETAIL",
+        "route": "/admin/campus/:id",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": [
+          "ContentPreview",
+          "MetadataPanel",
+          "ApprovalActionPanel",
+          "AdminNoteBox"
+        ],
+        "actions": ["approve_content", "reject_content"]
+      }
+    },
+
+    "community": {
+      "topics": {
+        "screen_id": "COMMUNITY_TOPIC_LIST",
+        "route": "/admin/community/topics",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["TopicTable", "CreateTopicModal"],
+        "actions": ["create_topic", "edit_topic", "toggle_topic_status"]
+      },
+
+      "posts": {
+        "list": {
+          "screen_id": "COMMUNITY_POST_LIST",
+          "route": "/admin/community/posts",
+          "type": "page",
+          "layout": "ADMIN_LAYOUT",
+          "components": ["PostTable", "FilterBar", "Pagination"]
+        },
+        "detail": {
+          "screen_id": "COMMUNITY_POST_DETAIL",
+          "route": "/admin/community/posts/:id",
+          "type": "page",
+          "layout": "ADMIN_LAYOUT",
+          "components": [
+            "PostContent",
+            "CommentList",
+            "ReportSummary",
+            "ModerationActions"
+          ],
+          "actions": ["hide_post", "delete_post"]
+        }
+      },
+
+      "reports": {
+        "screen_id": "COMMUNITY_REPORT_LIST",
+        "route": "/admin/community/reports",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["ReportTable", "ReportDetailModal"],
+        "actions": ["resolve_report", "take_moderation_action"]
+      }
+    },
+
+    "career": {
+      "recruiters": {
+        "screen_id": "RECRUITER_LIST",
+        "route": "/admin/career/recruiters",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["RecruiterTable", "VerificationModal"],
+        "actions": ["approve_recruiter", "reject_recruiter"]
+      },
+
+      "job_posts": {
+        "list": {
+          "screen_id": "JOB_POST_LIST",
+          "route": "/admin/career/jobs",
+          "type": "page",
+          "layout": "ADMIN_LAYOUT",
+          "components": ["JobPostTable", "FilterBar"]
+        },
+        "detail": {
+          "screen_id": "JOB_POST_DETAIL",
+          "route": "/admin/career/jobs/:id",
+          "type": "page",
+          "layout": "ADMIN_LAYOUT",
+          "components": [
+            "JobDetailView",
+            "JobMetaPanel",
+            "ApprovalActionPanel"
+          ],
+          "actions": ["approve_job", "reject_job", "close_job"]
+        }
+      },
+
+      "applications": {
+        "screen_id": "JOB_APPLICATION_LIST",
+        "route": "/admin/career/applications",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["ApplicationTable", "ApplicationTimelineModal"]
+      }
+    },
+
+    "users": {
+      "students": {
+        "screen_id": "STUDENT_LIST",
+        "route": "/admin/users/students",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["StudentTable", "StudentProfileDrawer"],
+        "actions": ["ban_student", "unban_student"]
+      },
+      "admins": {
+        "screen_id": "ADMIN_USER_LIST",
+        "route": "/admin/users/admins",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["AdminUserTable", "RoleAssignmentModal"]
+      }
+    },
+
+    "notifications": {
+      "screen_id": "ADMIN_NOTIFICATION_LIST",
+      "route": "/admin/notifications",
+      "type": "page",
+      "layout": "ADMIN_LAYOUT",
+      "components": ["NotificationTable"]
+    },
+
+    "audit_logs": {
+      "screen_id": "AUDIT_LOG_LIST",
+      "route": "/admin/audit-logs",
+      "type": "page",
+      "layout": "ADMIN_LAYOUT",
+      "components": ["AuditLogTable", "FilterBar"]
+    },
+
+    "settings": {
+      "system": {
+        "screen_id": "SYSTEM_SETTINGS",
+        "route": "/admin/settings/system",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["SystemSettingForm"]
+      },
+      "roles": {
+        "screen_id": "ROLE_PERMISSION",
+        "route": "/admin/settings/roles",
+        "type": "page",
+        "layout": "ADMIN_LAYOUT",
+        "components": ["RolePermissionMatrix"]
+      }
+    }
+  }
+}

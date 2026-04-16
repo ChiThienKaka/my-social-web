@@ -1,0 +1,208 @@
+{
+  "admin_app": {
+    "name": "University Social Media Admin",
+    "description": "Admin system for managing student social network, campus content, and career recruitment modules",
+    "roles": ["SUPER_ADMIN", "ADMIN", "MODERATOR"],
+
+    "modules": {
+      "dashboard": {
+        "description": "Overview and monitoring system health",
+        "features": [
+          "view_system_statistics",
+          "view_pending_approvals_summary",
+          "view_recent_admin_actions",
+          "view_growth_metrics"
+        ],
+        "data_sources": [
+          "users",
+          "job_posts",
+          "job_applications",
+          "recruiter_subscriptions",
+          "admin_action_logs"
+        ]
+      },
+
+      "campus": {
+        "description": "Manage official campus content and announcements",
+        "features": [
+          "view_campus_content_list",
+          "approve_campus_content",
+          "reject_campus_content",
+          "filter_content_by_status",
+          "log_admin_actions"
+        ],
+        "data_sources": ["campus_contents", "admin_action_logs"]
+      },
+
+      "community": {
+        "description": "Moderate student social community",
+        "sub_modules": {
+          "topics": {
+            "features": [
+              "create_topic",
+              "edit_topic",
+              "enable_disable_topic",
+              "view_topic_statistics"
+            ],
+            "data_sources": ["community_topics"]
+          },
+          "posts": {
+            "features": [
+              "view_post_list",
+              "view_post_detail",
+              "hide_post",
+              "delete_post",
+              "filter_posts_by_topic",
+              "filter_posts_by_status"
+            ],
+            "data_sources": ["posts", "comments", "reports"]
+          },
+          "reports": {
+            "features": [
+              "view_reported_posts",
+              "review_reports",
+              "take_moderation_action"
+            ],
+            "data_sources": ["reports", "posts"]
+          }
+        }
+      },
+
+      "career": {
+        "description": "Manage recruitment, companies, and job lifecycle",
+        "sub_modules": {
+          "packages": {
+            "features": [
+              "create_package",
+              "edit_package",
+              "activate_deactivate_package"
+            ],
+            "data_sources": ["recruiter_packages"]
+          },
+
+          "recruiter_subscriptions": {
+            "features": [
+              "view_subscription_list",
+              "approve_subscription",
+              "reject_subscription",
+              "verify_company",
+              "track_payment_status"
+            ],
+            "data_sources": ["recruiter_subscriptions"]
+          },
+
+          "job_categories": {
+            "features": [
+              "create_category",
+              "edit_category",
+              "delete_category",
+              "manage_category_hierarchy"
+            ],
+            "data_sources": ["job_categories"]
+          },
+
+          "job_skills": {
+            "features": [
+              "create_skill",
+              "edit_skill",
+              "delete_skill",
+              "assign_skill_to_category"
+            ],
+            "data_sources": ["job_skills"]
+          },
+
+          "job_posts": {
+            "features": [
+              "view_job_post_list",
+              "view_job_post_detail",
+              "approve_job_post",
+              "reject_job_post",
+              "close_job_post",
+              "track_job_performance"
+            ],
+            "data_sources": ["job_posts"]
+          },
+
+          "applications": {
+            "features": [
+              "view_application_list",
+              "view_application_detail",
+              "track_application_timeline",
+              "update_application_status",
+              "admin_notes_on_application"
+            ],
+            "data_sources": ["job_applications", "application_timeline"]
+          },
+
+          "company_reviews": {
+            "features": [
+              "view_reviews",
+              "approve_review",
+              "reject_review",
+              "hide_review"
+            ],
+            "data_sources": ["company_reviews"]
+          }
+        }
+      },
+
+      "users": {
+        "description": "User management across roles",
+        "sub_modules": {
+          "students": {
+            "features": [
+              "view_student_list",
+              "view_student_profile",
+              "ban_unban_student",
+              "view_student_skills"
+            ],
+            "data_sources": ["users", "student_profiles", "student_skills"]
+          },
+          "recruiters": {
+            "features": [
+              "view_recruiter_list",
+              "verify_recruiter",
+              "suspend_recruiter"
+            ],
+            "data_sources": ["users", "recruiter_subscriptions"]
+          },
+          "admins": {
+            "features": [
+              "create_admin_account",
+              "assign_admin_roles",
+              "disable_admin_account"
+            ],
+            "data_sources": ["users"]
+          }
+        }
+      },
+
+      "notifications": {
+        "description": "System notifications management",
+        "features": [
+          "view_notifications",
+          "mark_notification_as_read",
+          "filter_notifications_by_type"
+        ],
+        "data_sources": ["student_notifications", "recruiter_notifications"]
+      },
+
+      "audit_logs": {
+        "description": "Track and audit all admin actions",
+        "features": [
+          "view_admin_action_logs",
+          "filter_logs_by_admin",
+          "filter_logs_by_action_type",
+          "view_action_details"
+        ],
+        "data_sources": ["admin_action_logs"]
+      },
+
+      "settings": {
+        "description": "System configuration",
+        "features": ["manage_system_settings", "manage_roles_permissions"],
+        "data_sources": ["system_settings"]
+      }
+    }
+  }
+}
