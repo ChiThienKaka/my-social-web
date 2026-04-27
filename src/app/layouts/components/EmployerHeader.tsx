@@ -34,19 +34,21 @@ export function EmployerHeader() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-8">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-xs backdrop-blur supports-[backdrop-filter]:bg-white/90 md:px-6 lg:px-8">
       {/* Page Title */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
+      <div className="min-w-0">
+        <h1 className="truncate border-l-4 border-blue-500 pl-3 text-lg font-semibold tracking-tight text-slate-900 md:text-2xl">
+          {getPageTitle()}
+        </h1>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Notifications */}
-        <button className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900">
+        <button className="relative rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
           <Bell size={20} />
           {notificationCount > 0 && (
-            <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 p-0 text-xs text-white">
+            <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 p-0 text-[10px] font-semibold text-white">
               {notificationCount}
             </Badge>
           )}
@@ -57,32 +59,32 @@ export function EmployerHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="flex items-center gap-2 border-gray-300 hover:border-blue-600 hover:bg-blue-50"
+              className="h-10 gap-2 rounded-xl border-slate-200 bg-white px-2.5 transition-all hover:border-blue-500 hover:bg-blue-50 focus-visible:ring-blue-500 md:px-3"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100">
                 <User size={16} className="text-blue-600" />
               </div>
-              <span className="max-w-[150px] truncate font-medium text-gray-900">
+              <span className="hidden max-w-[160px] truncate text-sm font-medium text-slate-900 sm:block">
                 {companyName}
               </span>
-              <ChevronDown size={16} className="text-gray-500" />
+              <ChevronDown size={16} className="text-slate-500" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-60 rounded-xl border-slate-200 p-1">
             <DropdownMenuLabel>
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">{companyName}</span>
-                <span className="text-xs font-normal text-gray-500">
+                <span className="text-xs font-normal text-slate-500">
                   Employer Account
                 </span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer rounded-md">
               <User size={16} className="mr-2" />
               Company Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer rounded-md">
               <Bell size={16} className="mr-2" />
               Notifications
             </DropdownMenuItem>

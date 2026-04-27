@@ -14,6 +14,7 @@ import { TopicsPage } from "@/features/community/pages/TopicsPage";
 import { PostsListPage } from "@/features/community/pages/PostsListPage";
 import { PostDetailPage } from "@/features/community/pages/PostDetailPage";
 import { ReportsPage } from "@/features/community/pages/ReportsPage";
+import { CampusContentComingSoonPage } from "@/features/dashboard/pages/CampusContent_Coming soonPage";
 
 export function AdminRoutes() {
   return (
@@ -32,7 +33,8 @@ export function AdminRoutes() {
         <Route path="career/packages" element={<PackagesPage />} />
         <Route
           path="career/applications"
-          element={<div className="p-6">Applications - Coming soon</div>}
+          // element={<div className="p-6">Applications - Coming soon</div>}
+          element={<CampusContentComingSoonPage />}
         />
 
         {/* User Management */}
@@ -50,7 +52,8 @@ export function AdminRoutes() {
         {/* Placeholders */}
         <Route
           path="campus"
-          element={<div className="p-6">Campus Content - Coming soon</div>}
+          // element={<div className="p-6">Campus Content - Coming soon</div>}
+          element={<CampusContentComingSoonPage />}
         />
         <Route
           path="notifications"

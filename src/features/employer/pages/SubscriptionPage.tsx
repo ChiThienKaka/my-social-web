@@ -21,8 +21,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  createVnpayPaymentUrl,
   fetchActiveSubscription,
+  fetchRecruiterPackages,
   fetchSubscriptionHistory,
+  subscribeRecruiterPackage,
+  type RecruiterPackage,
   type Subscription,
 } from "../services/subscription.service";
 
@@ -30,6 +34,7 @@ const STATUS_CONFIG: Record<string, { label: string; class: string }> = {
   active: { label: "Đang hoạt động", class: "bg-green-100 text-green-700 border-green-200" },
   expired: { label: "Đã hết hạn", class: "bg-red-100 text-red-700 border-red-200" },
   cancelled: { label: "Đã hủy", class: "bg-gray-100 text-gray-700 border-gray-200" },
+  pending: { label: "Chờ thanh toán", class: "bg-yellow-100 text-yellow-700 border-yellow-200" },
 };
 
 function getDaysRemaining(endDate: string): number {
@@ -39,26 +44,32 @@ function getDaysRemaining(endDate: string): number {
   return Math.max(0, diff);
 }
 
-function formatPrice(price: string): string {
-  return parseInt(price).toLocaleString("vi-VN") + " ₫";
+function formatPrice(price: string | number): string {
+  const normalized = typeof price === "number" ? price : parseInt(price, 10);
+  return normalized.toLocaleString("vi-VN") + " ₫";
 }
 
 export function SubscriptionPage() {
   const [activeSub, setActiveSub] = useState<Subscription | null | undefined>(undefined);
   const [history, setHistory] = useState<Subscription[]>([]);
+  const [packages, setPackages] = useState<RecruiterPackage[]>([]);
+  const [subscribingPackageId, setSubscribingPackageId] = useState<number | null>(null);
+  const [payingSubscriptionId, setPayingSubscriptionId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       try {
-        const [active, hist] = await Promise.all([
+        const [active, hist, packageList] = await Promise.all([
           fetchActiveSubscription(),
           fetchSubscriptionHistory(),
+          fetchRecruiterPackages(),
         ]);
         if (mounted) {
           setActiveSub(active);
           setHistory(hist.data);
+          setPackages(packageList);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -90,8 +101,112 @@ export function SubscriptionPage() {
       .filter(Boolean);
   };
 
+  const handleSubscribePackage = async (packageId: number) => {
+    try {
+      setSubscribingPackageId(packageId);
+      await subscribeRecruiterPackage({ package_id: packageId });
+      const [active, hist] = await Promise.all([
+        fetchActiveSubscription(),
+        fetchSubscriptionHistory(),
+      ]);
+      setActiveSub(active);
+      setHistory(hist.data);
+      window.alert("Mua gói thành công.");
+    } catch (error) {
+      console.error("Subscribe package failed:", error);
+      window.alert("Mua gói thất bại. Vui lòng kiểm tra token hoặc thử lại.");
+    } finally {
+      setSubscribingPackageId(null);
+    }
+  };
+
+  const handlePayPendingSubscription = async (subscriptionId: number) => {
+    try {
+      setPayingSubscriptionId(subscriptionId);
+      const paymentUrl = await createVnpayPaymentUrl({
+        route_home: `${window.location.origin}/employer/subscription`,
+        subscription_id: subscriptionId,
+      });
+      window.location.href = paymentUrl;
+    } catch (error) {
+      console.error("Create VNPay payment failed:", error);
+      window.alert("Tạo link thanh toán thất bại. Vui lòng thử lại.");
+    } finally {
+      setPayingSubscriptionId(null);
+    }
+  };
+
   return (
     <div className="space-y-8">
+     {/* Packages List */}
+      <Card className="border border-gray-200 shadow-sm">
+  <CardHeader className="border-b border-gray-200 bg-white">
+    <div>
+      <h3 className="text-xl font-bold text-gray-900">Danh sách gói</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Các gói hiện có để bạn đăng ký hoặc nâng cấp
+      </p>
+    </div>
+  </CardHeader>
+
+  <CardContent className="p-6">
+    {packages.length === 0 ? (
+      <div className="flex h-24 items-center justify-center text-sm text-gray-400">
+        Chưa có gói nào khả dụng
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {packages.map((pkg) => (
+          <Card
+            key={pkg.package_id}
+            className="flex h-full flex-col border border-gray-200"
+          >
+            <CardContent className="flex h-full flex-col p-5">
+              
+              {/* CONTENT */}
+              <div className="flex-1">
+                <div className="mb-3 flex items-center justify-between">
+                  <h4 className="text-lg font-bold text-gray-900">
+                    {pkg.package_name}
+                  </h4>
+                  <Badge variant="outline" className="capitalize">
+                    {pkg.support_priority}
+                  </Badge>
+                </div>
+
+                <p className="text-2xl font-bold text-blue-600">
+                  {formatPrice(pkg.price)}
+                </p>
+                <p className="mb-4 text-sm text-gray-500">
+                  /{pkg.duration_days} ngày
+                </p>
+
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p>- {pkg.post_limit} bài đăng</p>
+                  <p>- {pkg.featured_posts_limit} bài nổi bật</p>
+                  <p>- {pkg.refresh_limit} lượt làm mới</p>
+                  <p>- Analytics: {pkg.features.analytics}</p>
+                  {pkg.features.logo_highlight && <p>- Highlight logo</p>}
+                  {pkg.features.top_search && <p>- Ưu tiên top search</p>}
+                </div>
+              </div>
+
+              {/* BUTTON */}
+              <Button
+                className="mt-auto w-full cursor-pointer bg-blue-600 hover:bg-blue-700"
+                onClick={() => handleSubscribePackage(pkg.package_id)}
+                disabled={subscribingPackageId === pkg.package_id}
+              >
+                {subscribingPackageId === pkg.package_id ? "Đang xử lý..." : "🚀 Chọn gói này"}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )}
+  </CardContent>
+      </Card>
+
       {/* Current Active Plan */}
       {activeSub ? (
         <Card className="border-2 border-blue-200 shadow-md">
@@ -270,6 +385,8 @@ export function SubscriptionPage() {
         </Card>
       )}
 
+     
+
       {/* Subscription History */}
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="border-b border-gray-200 bg-white">
@@ -294,6 +411,7 @@ export function SubscriptionPage() {
                   <TableHead className="font-semibold">Ngày kết thúc</TableHead>
                   <TableHead className="font-semibold">Giá</TableHead>
                   <TableHead className="font-semibold">Trạng thái</TableHead>
+                  <TableHead className="font-semibold">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -314,6 +432,22 @@ export function SubscriptionPage() {
                       >
                         {STATUS_CONFIG[sub.status]?.label ?? sub.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {sub.status === "pending" ? (
+                        <Button
+                          size="sm"
+                          className="bg-orange-600 hover:bg-orange-700"
+                          disabled={payingSubscriptionId === sub.subscription_id}
+                          onClick={() => handlePayPendingSubscription(sub.subscription_id)}
+                        >
+                          {payingSubscriptionId === sub.subscription_id
+                            ? "Đang tạo link..."
+                            : "Thanh toán"}
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
