@@ -29,6 +29,7 @@ import {
   type RecruiterPackage,
   type Subscription,
 } from "../services/subscription.service";
+import { message } from "antd";
 
 const STATUS_CONFIG: Record<string, { label: string; class: string }> = {
   active: { label: "Đang hoạt động", class: "bg-green-100 text-green-700 border-green-200" },
@@ -111,10 +112,10 @@ export function SubscriptionPage() {
       ]);
       setActiveSub(active);
       setHistory(hist.data);
-      window.alert("Mua gói thành công.");
+      message.success("Mua gói thành công.");
     } catch (error) {
       console.error("Subscribe package failed:", error);
-      window.alert("Mua gói thất bại. Vui lòng kiểm tra token hoặc thử lại.");
+      message.error("Mua gói thất bại. Vui lòng kiểm tra lại thông tin!.");
     } finally {
       setSubscribingPackageId(null);
     }
@@ -130,7 +131,7 @@ export function SubscriptionPage() {
       window.location.href = paymentUrl;
     } catch (error) {
       console.error("Create VNPay payment failed:", error);
-      window.alert("Tạo link thanh toán thất bại. Vui lòng thử lại.");
+      message.error("Tạo link thanh toán thất bại. Vui lòng thử lại.");
     } finally {
       setPayingSubscriptionId(null);
     }
