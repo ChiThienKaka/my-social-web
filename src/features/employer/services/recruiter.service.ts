@@ -26,6 +26,37 @@ const MOCK_OVERVIEW: DashboardOverview = {
   expiring_soon_posts: 3,
 };
 
+/** Hồ sơ recruiter (avatar, tên) — đổi path nếu backend dùng khác, ví dụ /auth/me */
+export interface RecruiterSessionProfile {
+  avatar_url?: string | null;
+  full_name?: string | null;
+}
+
+export async function fetchRecruiterSessionProfile(): Promise<RecruiterSessionProfile | null> {
+  try {
+    const res = await http.get<{ data: RecruiterSessionProfile & Record<string, unknown> }>(
+      "/recruiter/profile",
+    );
+    const raw = (res as { data?: unknown }).data;
+    if (!raw || typeof raw !== "object") return null;
+    const d = raw as Record<string, unknown>;
+    const nested =
+      d.user && typeof d.user === "object" ? (d.user as Record<string, unknown>) : null;
+    const avatar_url =
+      (d.avatar_url as string | null | undefined) ??
+      (nested?.avatar_url as string | null | undefined) ??
+      null;
+    const full_name =
+      (d.full_name as string | null | undefined) ??
+      (nested?.full_name as string | null | undefined) ??
+      null;
+    if (avatar_url == null && full_name == null) return null;
+    return { avatar_url, full_name };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchDashboardOverview(): Promise<DashboardOverview> {
   try {
     const res = await http.get<{ data: DashboardOverview }>(

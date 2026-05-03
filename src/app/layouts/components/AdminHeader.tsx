@@ -1,5 +1,6 @@
 import { Bell, Search, User, LogOut, Settings } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 export function AdminHeader() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+
+  const displayName = user?.name || "Admin User";
 
   const handleLogout = () => {
     logout();
@@ -50,12 +53,17 @@ export function AdminHeader() {
         {/* User Menu */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-              {(user?.name || "A")[0]}
-            </div>
+            <Avatar className="h-8 w-8 ring-2 ring-gray-100">
+              {user?.avatar_url ? (
+                <AvatarImage src={user.avatar_url} alt="" className="object-cover" />
+              ) : null}
+              <AvatarFallback className="bg-blue-100 text-blue-700">
+                <User className="h-4 w-4" aria-hidden />
+              </AvatarFallback>
+            </Avatar>
             <div className="text-sm">
               <div className="font-medium text-gray-900">
-                {user?.name || "Admin User"}
+                {displayName}
               </div>
               <div className="text-xs text-gray-500 uppercase">
                 {user?.role || "ADMIN"}

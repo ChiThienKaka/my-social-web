@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import { fetchRecruiterSessionProfile } from "@/features/employer/services/recruiter.service";
 
 export function EmployerHeader() {
   const [notificationCount] = useState(3);
@@ -20,6 +22,27 @@ export function EmployerHeader() {
 
   // Tên hiển thị lấy từ auth state (user.name)
   const companyName = user?.name || "Nhà tuyển dụng";
+  const avatarInitial = (companyName.trim().charAt(0) || "?").toUpperCase();
+
+  // Bổ sung avatar nếu login chưa có (backend trả ở GET profile — chỉnh path trong recruiter.service nếu khác)
+  useEffect(() => {
+    if (!user || user.role !== "employer" || user.avatar_url) return;
+    let cancelled = false;
+    void (async () => {
+      const extra = await fetchRecruiterSessionProfile();
+      if (cancelled || !extra?.avatar_url) return;
+      const latest = useAuthStore.getState().user;
+      if (!latest || latest.id !== user.id) return;
+      useAuthStore.getState().setUser({
+        ...latest,
+        avatar_url: extra.avatar_url,
+        ...(extra.full_name ? { name: extra.full_name } : {}),
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, user?.role, user?.avatar_url]);
 
   // Get page title from current path
   const getPageTitle = () => {
@@ -61,9 +84,14 @@ export function EmployerHeader() {
               variant="outline"
               className="h-10 gap-2 rounded-xl border-slate-200 bg-white px-2.5 transition-all hover:border-blue-500 hover:bg-blue-50 focus-visible:ring-blue-500 md:px-3"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100">
-                <User size={16} className="text-blue-600" />
-              </div>
+              <Avatar className="h-8 w-8 ring-2 ring-slate-100">
+                {user?.avatar_url ? (
+                  <AvatarImage src={user.avatar_url} alt="" className="object-cover" />
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-br from-blue-100 to-indigo-100 text-xs font-semibold text-blue-700">
+                  {avatarInitial}
+                </AvatarFallback>
+              </Avatar>
               <span className="hidden max-w-[160px] truncate text-sm font-medium text-slate-900 sm:block">
                 {companyName}
               </span>
@@ -72,11 +100,21 @@ export function EmployerHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-60 rounded-xl border-slate-200 p-1">
             <DropdownMenuLabel>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">{companyName}</span>
-                <span className="text-xs font-normal text-slate-500">
-                  Employer Account
-                </span>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10 ring-2 ring-slate-100">
+                  {user?.avatar_url ? (
+                    <AvatarImage src={user.avatar_url} alt="" className="object-cover" />
+                  ) : null}
+                  <AvatarFallback className="bg-gradient-to-br from-blue-100 to-indigo-100 text-sm font-semibold text-blue-700">
+                    {avatarInitial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm font-semibold">{companyName}</span>
+                  <span className="text-xs font-normal text-slate-500">
+                    Employer Account
+                  </span>
+                </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

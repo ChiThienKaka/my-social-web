@@ -14,7 +14,7 @@ import {
   Calendar,
   Users,
 } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -100,6 +100,56 @@ function formatSalary(min?: string, max?: string, type?: string) {
   return `Đến ${fmt(max!)}`;
 }
 
+/** Giờ:phút ngày/tháng/năm — múi Asia/Ho_Chi_Minh */
+function formatDateTimeVN(value: string | null | undefined): string {
+  if (value == null || value === "") return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).formatToParts(d);
+  const map: Record<string, string> = {};
+  for (const { type, value: v } of parts) {
+    if (type !== "literal") map[type] = v;
+  }
+  const h = map.hour ?? "";
+  const min = map.minute ?? "";
+  const day = map.day ?? "";
+  const month = map.month ?? "";
+  const year = map.year ?? "";
+  return `${h}:${min} ${day}/${month}/${year}`;
+}
+
+/** yyyy-MM-dd cho <input type="date"> (từ date-only hoặc ISO, theo giờ VN) */
+function toDateInputValue(value: string | undefined): string {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  const d = new Date(trimmed);
+  if (Number.isNaN(d.getTime())) return trimmed.slice(0, 10);
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const map: Record<string, string> = {};
+  for (const { type, value: v } of parts) {
+    if (type !== "literal") map[type] = v;
+  }
+  const y = map.year;
+  const m = map.month;
+  const day = map.day;
+  if (y && m && day) return `${y}-${m}-${day}`;
+  return trimmed.slice(0, 10);
+}
+
 export function JobsPage() {
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,7 +221,7 @@ export function JobsPage() {
       location_province: job.location_province,
       location_district: job.location_district ?? "",
       location_address: job.location_address ?? "",
-      application_deadline: job.application_deadline,
+      application_deadline: toDateInputValue(job.application_deadline),
       contact_email: job.contact_email ?? "",
       contact_phone: job.contact_phone ?? "",
       contact_person: job.contact_person ?? "",
@@ -348,7 +398,7 @@ export function JobsPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
-                        Hết hạn: {job.application_deadline}
+                        Hết hạn: {formatDateTimeVN(job.application_deadline)}
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="h-3.5 w-3.5" />
@@ -766,7 +816,7 @@ export function JobsPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Hạn nộp</p>
-                  <p className="font-medium">{viewJob.application_deadline}</p>
+                  <p className="font-medium">{formatDateTimeVN(viewJob.application_deadline)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Số lượng</p>
@@ -779,6 +829,10 @@ export function JobsPage() {
                 <div>
                   <p className="text-xs text-gray-400">Lượt xem</p>
                   <p className="font-medium">{viewJob.view_count}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Ngày đăng</p>
+                  <p className="font-medium">{formatDateTimeVN(viewJob.created_at)}</p>
                 </div>
               </div>
               {viewJob.job_description && (

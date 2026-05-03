@@ -7,6 +7,8 @@ export interface User {
   role: 'admin' | 'employer' | 'student';
   name?: string;
   companyName?: string;
+  /** Ảnh đại diện: thường từ response /auth/login hoặc GET profile sau đăng nhập */
+  avatar_url?: string | null;
 }
 
 interface AuthState {

@@ -78,6 +78,7 @@ export function AuthPage() {
           email: user.email,
           role: "employer",
           name: user.full_name,
+          avatar_url: user.avatar_url ?? null,
         },
         access_token,
       );

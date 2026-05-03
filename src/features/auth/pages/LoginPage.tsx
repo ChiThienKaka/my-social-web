@@ -152,6 +152,10 @@ export function LoginPage() {
           name: user.name || user.full_name || "Admin User",
           email: user.email,
           role,
+          avatar_url:
+            (user.avatar_url as string | null | undefined) ??
+            user.profile?.avatar_url ??
+            null,
         };
         console.log("Setting user in store:", userData);
 

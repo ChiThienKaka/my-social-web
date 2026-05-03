@@ -50,6 +50,32 @@ function formatPrice(price: string | number): string {
   return normalized.toLocaleString("vi-VN") + " ₫";
 }
 
+/** Giờ:phút ngày/tháng/năm theo múi Việt Nam (Asia/Ho_Chi_Minh) */
+function formatDateTimeVN(value: string | null | undefined): string {
+  if (value == null || value === "") return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).formatToParts(d);
+  const map: Record<string, string> = {};
+  for (const { type, value } of parts) {
+    if (type !== "literal") map[type] = value;
+  }
+  const h = map.hour ?? "";
+  const min = map.minute ?? "";
+  const day = map.day ?? "";
+  const month = map.month ?? "";
+  const year = map.year ?? "";
+  return `${h}:${min} ${day}/${month}/${year}`;
+}
+
 export function SubscriptionPage() {
   const [activeSub, setActiveSub] = useState<Subscription | null | undefined>(undefined);
   const [history, setHistory] = useState<Subscription[]>([]);
@@ -262,7 +288,9 @@ export function SubscriptionPage() {
                   <Calendar className="h-8 w-8 text-blue-600 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Ngày hết hạn</p>
-                    <p className="text-lg font-bold text-gray-900">{activeSub.end_date}</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {formatDateTimeVN(activeSub.end_date)}
+                    </p>
                     <p className={`text-xs ${daysRemaining <= 7 ? "text-red-600 font-semibold" : "text-blue-600"}`}>
                       {daysRemaining > 0
                         ? `Còn ${daysRemaining} ngày`
@@ -344,14 +372,18 @@ export function SubscriptionPage() {
                         <Clock className="h-3.5 w-3.5" />
                         Bắt đầu:
                       </span>
-                      <span className="font-medium text-gray-900">{activeSub.start_date}</span>
+                      <span className="font-medium text-gray-900">
+                        {formatDateTimeVN(activeSub.start_date)}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
                         Kết thúc:
                       </span>
-                      <span className="font-medium text-gray-900">{activeSub.end_date}</span>
+                      <span className="font-medium text-gray-900">
+                        {formatDateTimeVN(activeSub.end_date)}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Trạng thái:</span>
@@ -421,8 +453,12 @@ export function SubscriptionPage() {
                     <TableCell className="font-medium">
                       {sub.package.package_name}
                     </TableCell>
-                    <TableCell className="text-gray-600">{sub.start_date}</TableCell>
-                    <TableCell className="text-gray-600">{sub.end_date}</TableCell>
+                    <TableCell className="text-gray-600">
+                      {formatDateTimeVN(sub.start_date)}
+                    </TableCell>
+                    <TableCell className="text-gray-600">
+                      {formatDateTimeVN(sub.end_date)}
+                    </TableCell>
                     <TableCell className="font-semibold">
                       {formatPrice(sub.package.price)}
                     </TableCell>
