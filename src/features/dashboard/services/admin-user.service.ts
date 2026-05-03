@@ -10,12 +10,29 @@ export interface User {
   status: "active" | "banned" | "inactive";
   created_at: string;
   last_login_at?: string | null;
+  /** Một số API trả avatar ở root thay vì trong profile */
+  avatar_url?: string | null;
   profile?: {
     phone?: string;
     avatar_url?: string;
     date_of_birth?: string;
     gender?: string;
   } | null;
+}
+
+/** Chi tiết user từ GET /admin/user/{id} */
+export interface AdminUserDetail {
+  user_id: number;
+  email: string;
+  full_name: string;
+  phone: string | null;
+  is_verified: boolean;
+  status: string;
+  role_name: string;
+  created_at: string;
+  company_name: string | null;
+  student_code: string | null;
+  avatar_url: string | null;
 }
 
 export interface UserListResponse {
@@ -35,6 +52,8 @@ let MOCK_USERS: User[] = [
     status: "active",
     created_at: "2025-09-01T08:00:00.000000Z",
     last_login_at: "2026-03-27T10:30:00.000000Z",
+    avatar_url:
+      "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-12.jpg",
     profile: {
       phone: "0912345678",
       avatar_url: null,
@@ -163,6 +182,30 @@ export async function fetchUsers(params?: {
       current_page: page,
       total_pages: Math.ceil(filtered.length / perPage),
       total: filtered.length,
+    };
+  }
+}
+
+export async function fetchUserDetail(userId: number): Promise<AdminUserDetail> {
+  try {
+    const res = await http.get<{ data: AdminUserDetail }>(`/admin/user/${userId}`);
+    return (res as { data: AdminUserDetail }).data;
+  } catch {
+    await new Promise((r) => setTimeout(r, 300));
+    const u = MOCK_USERS.find((x) => x.user_id === userId);
+    if (!u) throw new Error("Không tìm thấy người dùng.");
+    return {
+      user_id: u.user_id,
+      email: u.email,
+      full_name: u.full_name || u.name || "Người dùng",
+      phone: u.profile?.phone ?? null,
+      is_verified: true,
+      status: u.status,
+      role_name: u.role_name,
+      created_at: u.created_at,
+      company_name: null,
+      student_code: null,
+      avatar_url: u.avatar_url ?? u.profile?.avatar_url ?? null,
     };
   }
 }

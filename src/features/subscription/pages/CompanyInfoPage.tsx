@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, FileText, MapPin, Globe, User, Phone, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Building2, FileText, MapPin, Globe, User, Phone, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Alert } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function CompanyInfoPage() {
   const navigate = useNavigate();
@@ -106,7 +106,8 @@ export function CompanyInfoPage() {
             <CardContent className="p-8">
               {error && (
                 <Alert variant="destructive" className="mb-6">
-                  {error}
+                  <AlertCircle className="shrink-0" />
+                  <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 

@@ -205,10 +205,9 @@ export function LoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Error Alert */}
               {error && (
                 <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircle className="h-4 w-4 shrink-0" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}

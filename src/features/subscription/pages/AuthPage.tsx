@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff, User, AlertCircle } from "lucide-react";
 import http from "@/lib/http";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ApiUser {
   user_id: number;
@@ -212,7 +212,8 @@ export function AuthPage() {
             <CardContent className="p-8">
               {error && (
                 <Alert variant="destructive" className="mb-6">
-                  {error}
+                  <AlertCircle className="shrink-0" />
+                  <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
